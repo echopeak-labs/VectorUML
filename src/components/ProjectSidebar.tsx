@@ -3,6 +3,16 @@ import { Project, Diagram } from '@/types/uml';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { 
   Plus, 
   FolderOpen, 
@@ -36,6 +46,8 @@ export function ProjectSidebar({
   const [editingProject, setEditingProject] = useState<string | null>(null);
   const [editingDiagram, setEditingDiagram] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [diagramToDelete, setDiagramToDelete] = useState<{ projectId: string; diagramId: string } | null>(null);
 
   const toggleProject = (projectId: string) => {
     const newExpanded = new Set(expandedProjects);
@@ -76,11 +88,18 @@ export function ProjectSidebar({
 
   const handleDeleteDiagram = (projectId: string, diagramId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (confirm('Delete this diagram?')) {
-      storage.deleteDiagram(projectId, diagramId);
+    setDiagramToDelete({ projectId, diagramId });
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteDiagram = () => {
+    if (diagramToDelete) {
+      storage.deleteDiagram(diagramToDelete.projectId, diagramToDelete.diagramId);
       onProjectsUpdate();
       toast.success('Diagram deleted');
+      setDiagramToDelete(null);
     }
+    setDeleteDialogOpen(false);
   };
 
   const handleRenameProject = (projectId: string, newName: string) => {
@@ -248,6 +267,21 @@ export function ProjectSidebar({
           ))}
         </div>
       </ScrollArea>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Diagram</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this diagram? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteDiagram}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
