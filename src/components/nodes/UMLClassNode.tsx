@@ -45,15 +45,15 @@ export const UMLClassNode = memo(({ data, type, id }: NodeProps) => {
 
   return (
     <div className={`rounded-lg border-2 bg-card shadow-lg min-w-[240px]`} style={{ borderColor: `hsl(var(--${color}))` }}>
-      {/* Connection Handles */}
+      {/* Connection Handles - all bidirectional */}
       <Handle 
-        type="target" 
+        type="source" 
         position={Position.Top} 
         id="top"
         className="w-3 h-3 !bg-primary hover:!bg-primary/80" 
       />
       <Handle 
-        type="target" 
+        type="source" 
         position={Position.Left} 
         id="left"
         className="w-3 h-3 !bg-primary hover:!bg-primary/80" 

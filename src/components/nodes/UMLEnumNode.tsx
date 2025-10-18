@@ -32,15 +32,15 @@ export const UMLEnumNode = memo(({ data }: NodeProps) => {
 
   return (
     <div className="rounded-lg border-2 border-uml-enum bg-card shadow-lg min-w-[200px]">
-      {/* Connection Handles */}
+      {/* Connection Handles - all bidirectional */}
       <Handle 
-        type="target" 
+        type="source" 
         position={Position.Top} 
         id="top"
         className="w-3 h-3 !bg-uml-enum hover:!bg-uml-enum/80" 
       />
       <Handle 
-        type="target" 
+        type="source" 
         position={Position.Left} 
         id="left"
         className="w-3 h-3 !bg-uml-enum hover:!bg-uml-enum/80" 

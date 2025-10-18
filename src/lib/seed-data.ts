@@ -78,24 +78,7 @@ export const seedProject: Project = {
           },
         },
       ],
-      edges: [
-        {
-          id: 'edge-1',
-          from: { nodeId: 'user-class', port: 'right' },
-          to: { nodeId: 'auth-interface', port: 'left' },
-          relation: 'realization',
-          labels: { center: 'implements' },
-          style: { dashed: true },
-        },
-        {
-          id: 'edge-2',
-          from: { nodeId: 'user-class', port: 'bottom' },
-          to: { nodeId: 'role-enum', port: 'top' },
-          relation: 'association',
-          labels: { center: 'has' },
-          style: { dashed: false },
-        },
-      ],
+      edges: [],
     },
     {
       id: 'diagram-2',
@@ -166,24 +149,7 @@ export const seedProject: Project = {
           },
         },
       ],
-      edges: [
-        {
-          id: 'edge-1',
-          from: { nodeId: 'order-class', port: 'left' },
-          to: { nodeId: 'customer-class', port: 'top' },
-          relation: 'aggregation',
-          labels: { center: '1..*' },
-          style: { dashed: false },
-        },
-        {
-          id: 'edge-2',
-          from: { nodeId: 'order-class', port: 'right' },
-          to: { nodeId: 'item-class', port: 'top' },
-          relation: 'composition',
-          labels: { center: '1..*' },
-          style: { dashed: false },
-        },
-      ],
+      edges: [],
     },
   ],
 };

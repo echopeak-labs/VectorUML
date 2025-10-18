@@ -32,15 +32,15 @@ export const UMLInterfaceNode = memo(({ data }: NodeProps) => {
 
   return (
     <div className="rounded-lg border-2 border-uml-interface bg-card shadow-lg min-w-[240px]">
-      {/* Connection Handles */}
+      {/* Connection Handles - all bidirectional */}
       <Handle 
-        type="target" 
+        type="source" 
         position={Position.Top} 
         id="top"
         className="w-3 h-3 !bg-uml-interface hover:!bg-uml-interface/80" 
       />
       <Handle 
-        type="target" 
+        type="source" 
         position={Position.Left} 
         id="left"
         className="w-3 h-3 !bg-uml-interface hover:!bg-uml-interface/80" 
