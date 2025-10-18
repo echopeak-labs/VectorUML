@@ -129,6 +129,9 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
   // Handle delete key press for selected edges and nodes
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      // Only trigger on Delete key (not Backspace)
+      if (event.key !== 'Delete') return;
+
       // Don't delete if user is typing in an input field
       const target = event.target as HTMLElement;
       const isTyping = target.tagName === 'INPUT' || 
@@ -137,11 +140,9 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
       
       if (isTyping) return;
 
-      if (event.key === 'Delete' || event.key === 'Backspace') {
-        event.preventDefault(); // Prevent browser back navigation
-        setEdges((eds) => eds.filter((edge) => !edge.selected));
-        setNodes((nds) => nds.filter((node) => !node.selected));
-      }
+      event.preventDefault();
+      setEdges((eds) => eds.filter((edge) => !edge.selected));
+      setNodes((nds) => nds.filter((node) => !node.selected));
     };
 
     document.addEventListener('keydown', handleKeyDown);
