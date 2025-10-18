@@ -174,7 +174,10 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
         ...params,
         type: 'smoothstep',
         animated: false,
-        style: { stroke: 'hsl(var(--primary))', strokeWidth: 2 },
+        style: { 
+          stroke: 'hsl(var(--primary))', 
+          strokeWidth: 2.5,
+        },
       }, eds));
     },
     [setEdges]
@@ -238,9 +241,20 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
             ? { 
                 ...e, 
                 label: newLabel,
-                labelStyle: { fill: 'hsl(var(--foreground))', fontSize: 12 },
-                labelBgStyle: { fill: 'hsl(var(--card))', fillOpacity: 0.9 },
-                labelBgPadding: [4, 4] as [number, number],
+                labelStyle: { 
+                  fill: 'hsl(var(--foreground))', 
+                  fontSize: 13, 
+                  fontWeight: 500,
+                  letterSpacing: '0.02em'
+                },
+                labelBgStyle: { 
+                  fill: 'hsl(var(--card))', 
+                  fillOpacity: 0.95,
+                  rx: 4,
+                  filter: 'drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3))'
+                },
+                labelBgPadding: [8, 6] as [number, number],
+                labelBgBorderRadius: 4,
               }
             : e
         )
