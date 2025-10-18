@@ -27,13 +27,14 @@ export function ContextMenu({ x, y, onClose, onCreateNode }: ContextMenuProps) {
     };
 
     // Add listeners with a slight delay to prevent immediate closure
-    setTimeout(() => {
-      document.addEventListener('mousedown', handleClickOutside);
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('click', handleClickOutside);
       document.addEventListener('contextmenu', handleContextMenu);
-    }, 0);
+    }, 100);
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      clearTimeout(timeoutId);
+      document.removeEventListener('click', handleClickOutside);
       document.removeEventListener('contextmenu', handleContextMenu);
     };
   }, [onClose]);
