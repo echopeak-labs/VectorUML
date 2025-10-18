@@ -85,7 +85,7 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
     [setEdges]
   );
 
-  // Handle delete key press for selected edges
+  // Handle delete key press for selected edges and nodes
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Delete' || event.key === 'Backspace') {
@@ -97,6 +97,31 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [setEdges, setNodes]);
+
+  // Handle double-click on edge to add/edit label
+  const onEdgeDoubleClick = useCallback(
+    (_event: React.MouseEvent, edge: Edge) => {
+      const currentLabel = edge.label as string || '';
+      const newLabel = prompt('Enter edge label:', currentLabel);
+      
+      if (newLabel !== null) {
+        setEdges((eds) =>
+          eds.map((e) =>
+            e.id === edge.id
+              ? { 
+                  ...e, 
+                  label: newLabel,
+                  labelStyle: { fill: 'hsl(var(--foreground))', fontSize: 12 },
+                  labelBgStyle: { fill: 'hsl(var(--card))', fillOpacity: 0.9 },
+                  labelBgPadding: [4, 4] as [number, number],
+                }
+              : e
+          )
+        );
+      }
+    },
+    [setEdges]
+  );
 
   const handleContextMenu = useCallback((event: React.MouseEvent) => {
     event.preventDefault();
@@ -221,6 +246,7 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onEdgeDoubleClick={onEdgeDoubleClick}
         onInit={setReactFlowInstance}
         nodeTypes={nodeTypes}
         fitView

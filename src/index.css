@@ -82,4 +82,15 @@ All colors MUST be HSL.
     stroke: hsl(var(--accent)) !important;
     stroke-width: 2.5 !important;
   }
+
+  /* Edge label styling */
+  .react-flow__edge-textbg {
+    fill: hsl(var(--card)) !important;
+    fill-opacity: 0.9 !important;
+  }
+
+  .react-flow__edge-text {
+    fill: hsl(var(--foreground)) !important;
+    font-size: 12px !important;
+  }
 }
