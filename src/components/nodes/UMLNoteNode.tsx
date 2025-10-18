@@ -1,8 +1,15 @@
-import { memo } from 'react';
+import { memo, useState, useCallback } from 'react';
 import { NodeProps } from '@xyflow/react';
 import { FileText } from 'lucide-react';
 
 export const UMLNoteNode = memo(({ data }: NodeProps) => {
+  const [localText, setLocalText] = useState<string>((data as any).text || '');
+
+  const handleTextChange = useCallback((newText: string) => {
+    setLocalText(newText);
+    (data as any).text = newText;
+  }, [data]);
+
   return (
     <div className="rounded-lg border-2 border-uml-note bg-card shadow-lg min-w-[200px] max-w-[300px]">
       {/* Header */}
@@ -14,8 +21,8 @@ export const UMLNoteNode = memo(({ data }: NodeProps) => {
       {/* Text Content */}
       <div className="px-3 py-2">
         <textarea
-          value={(data as any).text || ''}
-          onChange={(e) => ((data as any).text = e.target.value)}
+          value={localText}
+          onChange={(e) => handleTextChange(e.target.value)}
           className="bg-transparent text-xs w-full outline-none resize-none min-h-[60px]"
           placeholder="Enter note text..."
         />

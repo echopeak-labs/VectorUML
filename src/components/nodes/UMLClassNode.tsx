@@ -1,34 +1,47 @@
-import { memo, useState } from 'react';
-import { Handle, Position, NodeProps } from '@xyflow/react';
+import { memo, useState, useCallback } from 'react';
+import { Handle, Position, NodeProps, useUpdateNodeInternals } from '@xyflow/react';
 import { getNodeIcon, getNodeColor } from '@/lib/uml-utils';
 import { Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 
-export const UMLClassNode = memo(({ data, type }: NodeProps) => {
+export const UMLClassNode = memo(({ data, type, id }: NodeProps) => {
   const Icon = getNodeIcon(type as any);
   const color = getNodeColor(type as any);
+  const updateNodeInternals = useUpdateNodeInternals();
 
-  const fields: any[] = (data as any).fields || [];
-  const methods: any[] = (data as any).methods || [];
+  const [localData, setLocalData] = useState<any>(() => ({
+    name: (data as any).name || 'NewClass',
+    fields: (data as any).fields || [],
+    methods: (data as any).methods || [],
+  }));
 
-  const addField = () => {
-    const newFields = [...fields, { visibility: '+' as const, name: 'newField', type: 'string' }];
-    (data as any).fields = newFields;
-  };
+  const updateData = useCallback((updates: Partial<typeof localData>) => {
+    setLocalData((prev: any) => {
+      const newData = { ...prev, ...updates };
+      Object.assign(data, newData);
+      return newData;
+    });
+  }, [data]);
 
-  const addMethod = () => {
-    const newMethods = [...methods, { visibility: '+' as const, name: 'newMethod', params: [], returns: 'void' }];
-    (data as any).methods = newMethods;
-  };
+  const addField = useCallback(() => {
+    const newFields = [...localData.fields, { visibility: '+' as const, name: 'newField', type: 'string' }];
+    updateData({ fields: newFields });
+  }, [localData.fields, updateData]);
 
-  const removeField = (index: number) => {
-    (data as any).fields = fields.filter((_: any, i: number) => i !== index);
-  };
+  const addMethod = useCallback(() => {
+    const newMethods = [...localData.methods, { visibility: '+' as const, name: 'newMethod', params: [], returns: 'void' }];
+    updateData({ methods: newMethods });
+  }, [localData.methods, updateData]);
 
-  const removeMethod = (index: number) => {
-    (data as any).methods = methods.filter((_: any, i: number) => i !== index);
-  };
+  const removeField = useCallback((index: number) => {
+    const newFields = localData.fields.filter((_: any, i: number) => i !== index);
+    updateData({ fields: newFields });
+  }, [localData.fields, updateData]);
+
+  const removeMethod = useCallback((index: number) => {
+    const newMethods = localData.methods.filter((_: any, i: number) => i !== index);
+    updateData({ methods: newMethods });
+  }, [localData.methods, updateData]);
 
   return (
     <div className={`rounded-lg border-2 bg-card shadow-lg min-w-[240px]`} style={{ borderColor: `hsl(var(--${color}))` }}>
@@ -42,8 +55,8 @@ export const UMLClassNode = memo(({ data, type }: NodeProps) => {
         <Icon className="h-4 w-4 text-primary-foreground" />
         <input
           type="text"
-          value={(data as any).name}
-          onChange={(e) => ((data as any).name = e.target.value)}
+          value={localData.name}
+          onChange={(e) => updateData({ name: e.target.value })}
           className="bg-transparent text-primary-foreground font-semibold text-sm flex-1 outline-none border-none"
         />
       </div>
@@ -57,20 +70,28 @@ export const UMLClassNode = memo(({ data, type }: NodeProps) => {
               <Plus className="h-3 w-3" />
             </Button>
           </div>
-          {fields.map((field: any, i: number) => (
+          {localData.fields.map((field: any, i: number) => (
             <div key={i} className="flex items-center gap-1 mb-1 group">
               <span className="text-xs">{field.visibility}</span>
               <input
                 type="text"
                 value={field.name}
-                onChange={(e) => (field.name = e.target.value)}
+                onChange={(e) => {
+                  const newFields = [...localData.fields];
+                  newFields[i] = { ...field, name: e.target.value };
+                  updateData({ fields: newFields });
+                }}
                 className="bg-transparent text-xs flex-1 outline-none"
               />
               <span className="text-xs text-muted-foreground">:</span>
               <input
                 type="text"
                 value={field.type}
-                onChange={(e) => (field.type = e.target.value)}
+                onChange={(e) => {
+                  const newFields = [...localData.fields];
+                  newFields[i] = { ...field, type: e.target.value };
+                  updateData({ fields: newFields });
+                }}
                 className="bg-transparent text-xs w-20 outline-none"
               />
               <Button
@@ -95,13 +116,17 @@ export const UMLClassNode = memo(({ data, type }: NodeProps) => {
               <Plus className="h-3 w-3" />
             </Button>
           </div>
-          {methods.map((method: any, i: number) => (
+          {localData.methods.map((method: any, i: number) => (
             <div key={i} className="flex items-center gap-1 mb-1 group">
               <span className="text-xs">{method.visibility}</span>
               <input
                 type="text"
                 value={method.name}
-                onChange={(e) => (method.name = e.target.value)}
+                onChange={(e) => {
+                  const newMethods = [...localData.methods];
+                  newMethods[i] = { ...method, name: e.target.value };
+                  updateData({ methods: newMethods });
+                }}
                 className="bg-transparent text-xs flex-1 outline-none"
               />
               <span className="text-xs">()</span>
@@ -109,7 +134,11 @@ export const UMLClassNode = memo(({ data, type }: NodeProps) => {
               <input
                 type="text"
                 value={method.returns}
-                onChange={(e) => (method.returns = e.target.value)}
+                onChange={(e) => {
+                  const newMethods = [...localData.methods];
+                  newMethods[i] = { ...method, returns: e.target.value };
+                  updateData({ methods: newMethods });
+                }}
                 className="bg-transparent text-xs w-16 outline-none"
               />
               <Button

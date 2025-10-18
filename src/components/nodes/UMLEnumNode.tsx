@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useState, useCallback } from 'react';
 import { Handle, Position, NodeProps } from '@xyflow/react';
 import { getNodeIcon } from '@/lib/uml-utils';
 import { Plus, Trash2 } from 'lucide-react';
@@ -6,16 +6,29 @@ import { Button } from '@/components/ui/button';
 
 export const UMLEnumNode = memo(({ data }: NodeProps) => {
   const Icon = getNodeIcon('enum');
-  const values: any[] = (data as any).values || [];
 
-  const addValue = () => {
-    const newValues = [...values, 'NEW_VALUE'];
-    (data as any).values = newValues;
-  };
+  const [localData, setLocalData] = useState<any>(() => ({
+    name: (data as any).name || 'NewEnum',
+    values: (data as any).values || [],
+  }));
 
-  const removeValue = (index: number) => {
-    (data as any).values = values.filter((_: any, i: number) => i !== index);
-  };
+  const updateData = useCallback((updates: Partial<typeof localData>) => {
+    setLocalData((prev: any) => {
+      const newData = { ...prev, ...updates };
+      Object.assign(data, newData);
+      return newData;
+    });
+  }, [data]);
+
+  const addValue = useCallback(() => {
+    const newValues = [...localData.values, 'NEW_VALUE'];
+    updateData({ values: newValues });
+  }, [localData.values, updateData]);
+
+  const removeValue = useCallback((index: number) => {
+    const newValues = localData.values.filter((_: any, i: number) => i !== index);
+    updateData({ values: newValues });
+  }, [localData.values, updateData]);
 
   return (
     <div className="rounded-lg border-2 border-uml-enum bg-card shadow-lg min-w-[200px]">
@@ -29,8 +42,8 @@ export const UMLEnumNode = memo(({ data }: NodeProps) => {
         <Icon className="h-4 w-4 text-accent-foreground" />
         <input
           type="text"
-          value={(data as any).name}
-          onChange={(e) => ((data as any).name = e.target.value)}
+          value={localData.name}
+          onChange={(e) => updateData({ name: e.target.value })}
           className="bg-transparent text-accent-foreground font-semibold text-sm flex-1 outline-none border-none"
         />
       </div>
@@ -46,15 +59,15 @@ export const UMLEnumNode = memo(({ data }: NodeProps) => {
             <Plus className="h-3 w-3" />
           </Button>
         </div>
-        {values.map((value: string, i: number) => (
+        {localData.values.map((value: string, i: number) => (
           <div key={i} className="flex items-center gap-1 mb-1 group">
             <input
               type="text"
               value={value}
               onChange={(e) => {
-                const newValues = [...values];
+                const newValues = [...localData.values];
                 newValues[i] = e.target.value;
-                (data as any).values = newValues;
+                updateData({ values: newValues });
               }}
               className="bg-transparent text-xs flex-1 outline-none uppercase"
             />

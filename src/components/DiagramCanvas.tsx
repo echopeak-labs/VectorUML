@@ -49,14 +49,14 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
 
-  // Convert diagram data to React Flow format
+  // Convert diagram data to React Flow format only when diagram changes
   useEffect(() => {
     if (diagram) {
       const flowNodes: Node[] = diagram.nodes.map((node) => ({
         id: node.id,
         type: node.type,
         position: node.position,
-        data: node.data,
+        data: { ...node.data }, // Clone data to prevent mutations
       }));
 
       const flowEdges: Edge[] = diagram.edges.map((edge) => ({
@@ -71,7 +71,7 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
       setNodes(flowNodes);
       setEdges(flowEdges);
     }
-  }, [diagram, setNodes, setEdges]);
+  }, [diagram.id]); // Only re-run when diagram ID changes, not on every diagram update
 
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
@@ -153,38 +153,45 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
     input.click();
   }, [onDiagramUpdate]);
 
-  // Save changes back to diagram
+  // Save changes back to diagram with debounce - but prevent infinite loops
   useEffect(() => {
+    if (nodes.length === 0 && edges.length === 0) return;
+    
     const saveTimeout = setTimeout(() => {
-      if (nodes.length > 0 || edges.length > 0) {
-        const updatedNodes = nodes.map((node) => ({
-          id: node.id,
-          type: node.type as any,
-          icon: node.type,
-          position: node.position,
-          size: { w: 240, h: 120 },
-          connectors: ['top', 'right', 'bottom', 'left'] as any,
-          data: node.data,
-        }));
+      const updatedNodes = nodes.map((node) => ({
+        id: node.id,
+        type: node.type as any,
+        icon: node.type,
+        position: node.position,
+        size: { w: 240, h: 120 },
+        connectors: ['top', 'right', 'bottom', 'left'] as any,
+        data: node.data,
+      }));
 
-        const updatedEdges = edges.map((edge) => ({
-          id: edge.id,
-          from: { nodeId: edge.source, port: 'right' as any },
-          to: { nodeId: edge.target, port: 'left' as any },
-          relation: 'association' as any,
-          labels: { center: edge.label as string },
-          style: { dashed: edge.type === 'step' },
-        }));
+      const updatedEdges = edges.map((edge) => ({
+        id: edge.id,
+        from: { nodeId: edge.source, port: 'right' as any },
+        to: { nodeId: edge.target, port: 'left' as any },
+        relation: 'association' as any,
+        labels: { center: edge.label as string },
+        style: { dashed: edge.type === 'step' },
+      }));
 
+      // Only update if there are actual changes
+      const hasChanges = 
+        JSON.stringify(updatedNodes) !== JSON.stringify(diagram.nodes) ||
+        JSON.stringify(updatedEdges) !== JSON.stringify(diagram.edges);
+
+      if (hasChanges) {
         onDiagramUpdate({
           nodes: updatedNodes,
           edges: updatedEdges,
         });
       }
-    }, 500);
+    }, 1000); // Increased debounce to 1 second
 
     return () => clearTimeout(saveTimeout);
-  }, [nodes, edges, onDiagramUpdate]);
+  }, [nodes, edges]); // Removed onDiagramUpdate and diagram from dependencies
 
   return (
     <div className="h-full w-full" onContextMenu={handleContextMenu}>
