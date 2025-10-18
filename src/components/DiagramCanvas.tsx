@@ -62,8 +62,9 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
         type: node.type,
         position: node.position,
         data: { ...node.data }, // Clone data to prevent mutations
-        ...(node.type === 'note' && node.size ? {
-          style: { width: node.size.w, height: node.size.h },
+        ...(node.type === 'note' ? {
+          width: node.size?.w || 250,
+          height: node.size?.h || 150,
         } : {}),
       }));
 
@@ -167,7 +168,8 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
           text: type === 'note' ? 'Note text' : undefined,
         },
         ...(type === 'note' ? {
-          style: { width: 250, height: 150 },
+          width: 250,
+          height: 150,
         } : {}),
       };
 
@@ -222,19 +224,22 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
     
     const saveTimeout = setTimeout(() => {
       const updatedNodes = nodes.map((node) => {
-        const baseNode = {
+        // For notes, capture the actual width/height from the node
+        const nodeWidth = node.width || node.style?.width || (node.type === 'note' ? 250 : 240);
+        const nodeHeight = node.height || node.style?.height || (node.type === 'note' ? 150 : 120);
+        
+        return {
           id: node.id,
           type: node.type as any,
           icon: node.type,
           position: node.position,
           size: { 
-            w: node.style?.width ? Number(node.style.width) : 240, 
-            h: node.style?.height ? Number(node.style.height) : 120 
+            w: typeof nodeWidth === 'number' ? nodeWidth : parseInt(String(nodeWidth)), 
+            h: typeof nodeHeight === 'number' ? nodeHeight : parseInt(String(nodeHeight))
           },
           connectors: ['top', 'right', 'bottom', 'left'] as any,
           data: node.data,
         };
-        return baseNode;
       });
 
       const updatedEdges = edges.map((edge) => ({
