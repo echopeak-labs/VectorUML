@@ -20,8 +20,23 @@ export function ContextMenu({ x, y, onClose, onCreateNode }: ContextMenuProps) {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    const handleContextMenu = (event: MouseEvent) => {
+      // Close menu on right-click anywhere
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+
+    // Add listeners with a slight delay to prevent immediate closure
+    setTimeout(() => {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('contextmenu', handleContextMenu);
+    }, 0);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('contextmenu', handleContextMenu);
+    };
   }, [onClose]);
 
   const commonNodes = [

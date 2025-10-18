@@ -141,6 +141,7 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
 
   const handleContextMenu = useCallback((event: React.MouseEvent) => {
     event.preventDefault();
+    event.stopPropagation();
     setContextMenu({
       x: event.clientX,
       y: event.clientY,
