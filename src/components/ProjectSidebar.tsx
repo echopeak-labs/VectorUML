@@ -60,6 +60,8 @@ export function ProjectSidebar({
   const [createDiagramDialogOpen, setCreateDiagramDialogOpen] = useState(false);
   const [projectIdForNewDiagram, setProjectIdForNewDiagram] = useState<string | null>(null);
   const [newDiagramName, setNewDiagramName] = useState('');
+  const [createProjectDialogOpen, setCreateProjectDialogOpen] = useState(false);
+  const [newProjectName, setNewProjectName] = useState('');
 
   const toggleProject = (projectId: string) => {
     const newExpanded = new Set(expandedProjects);
@@ -72,12 +74,18 @@ export function ProjectSidebar({
   };
 
   const handleCreateProject = () => {
-    const name = prompt('Enter project name:');
-    if (name?.trim()) {
-      storage.createProject(name.trim());
+    setNewProjectName('');
+    setCreateProjectDialogOpen(true);
+  };
+
+  const confirmCreateProject = () => {
+    if (newProjectName.trim()) {
+      storage.createProject(newProjectName.trim());
       onProjectsUpdate();
       toast.success('Project created');
+      setNewProjectName('');
     }
+    setCreateProjectDialogOpen(false);
   };
 
   const handleCreateDiagram = (projectId: string) => {
@@ -334,6 +342,43 @@ export function ProjectSidebar({
               Cancel
             </Button>
             <Button onClick={confirmCreateDiagram} disabled={!newDiagramName.trim()}>
+              Create
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={createProjectDialogOpen} onOpenChange={setCreateProjectDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Create New Project</DialogTitle>
+            <DialogDescription>
+              Enter a name for your new project
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="project-name">Project Name</Label>
+              <Input
+                id="project-name"
+                value={newProjectName}
+                onChange={(e) => setNewProjectName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && newProjectName.trim()) {
+                    confirmCreateProject();
+                  }
+                }}
+                placeholder="Enter project name"
+                autoFocus
+                maxLength={100}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCreateProjectDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={confirmCreateProject} disabled={!newProjectName.trim()}>
               Create
             </Button>
           </DialogFooter>
