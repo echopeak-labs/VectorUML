@@ -6,8 +6,6 @@ import {
   MiniMap,
   useNodesState,
   useEdgesState,
-  addEdge,
-  Connection,
   Node,
   Edge,
   BackgroundVariant,
@@ -73,10 +71,7 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
     }
   }, [diagram.id]); // Only re-run when diagram ID changes, not on every diagram update
 
-  const onConnect = useCallback(
-    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges]
-  );
+  // Removed onConnect for now - will implement proper edge creation later
 
   const handleContextMenu = useCallback((event: React.MouseEvent) => {
     event.preventDefault();
@@ -200,11 +195,13 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
         onInit={setReactFlowInstance}
         nodeTypes={nodeTypes}
         fitView
         className="bg-canvas"
+        nodesDraggable={true}
+        nodesConnectable={false}
+        elementsSelectable={true}
       >
         <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="hsl(var(--grid))" />
         <Controls />
