@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   ReactFlow,
   Background,
-  Controls,
   MiniMap,
   useNodesState,
   useEdgesState,
@@ -278,7 +277,6 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
         }}
       >
         <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="hsl(var(--grid))" />
-        <Controls />
         <MiniMap
           nodeColor={(node) => {
             return `hsl(var(--uml-${node.type}))`;
