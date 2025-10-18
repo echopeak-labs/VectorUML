@@ -12,6 +12,40 @@ interface ContextMenuProps {
 export function ContextMenu({ x, y, onClose, onCreateNode }: ContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
 
+  // Adjust menu position if it would go off-screen
+  const getAdjustedPosition = () => {
+    const menuWidth = 256; // w-64 = 16rem = 256px
+    const menuHeight = 500; // max-h-[500px]
+    const padding = 10;
+
+    let adjustedX = x;
+    let adjustedY = y;
+
+    // Check right edge
+    if (x + menuWidth + padding > window.innerWidth) {
+      adjustedX = window.innerWidth - menuWidth - padding;
+    }
+
+    // Check bottom edge
+    if (y + menuHeight + padding > window.innerHeight) {
+      adjustedY = window.innerHeight - menuHeight - padding;
+    }
+
+    // Ensure menu doesn't go off left edge
+    if (adjustedX < padding) {
+      adjustedX = padding;
+    }
+
+    // Ensure menu doesn't go off top edge
+    if (adjustedY < padding) {
+      adjustedY = padding;
+    }
+
+    return { x: adjustedX, y: adjustedY };
+  };
+
+  const position = getAdjustedPosition();
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -77,9 +111,9 @@ export function ContextMenu({ x, y, onClose, onCreateNode }: ContextMenuProps) {
     <Card
       ref={menuRef}
       className="fixed z-50 w-64 p-2 shadow-xl border-border bg-popover"
-      style={{ left: x, top: y }}
+      style={{ left: position.x, top: position.y }}
     >
-      <div className="space-y-3 max-h-[500px] overflow-y-auto">
+      <div className="space-y-3 max-h-[500px] overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border hover:scrollbar-thumb-primary">
         <div>
           <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">Common</div>
           <div className="space-y-1">
