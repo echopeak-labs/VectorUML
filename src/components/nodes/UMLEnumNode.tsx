@@ -32,7 +32,31 @@ export const UMLEnumNode = memo(({ data }: NodeProps) => {
 
   return (
     <div className="rounded-lg border-2 border-uml-enum bg-card shadow-lg min-w-[200px]">
-      {/* Handles removed for now - will implement proper connection system later */}
+      {/* Connection Handles */}
+      <Handle 
+        type="target" 
+        position={Position.Top} 
+        id="top"
+        className="w-3 h-3 !bg-uml-enum hover:!bg-uml-enum/80" 
+      />
+      <Handle 
+        type="target" 
+        position={Position.Left} 
+        id="left"
+        className="w-3 h-3 !bg-uml-enum hover:!bg-uml-enum/80" 
+      />
+      <Handle 
+        type="source" 
+        position={Position.Right} 
+        id="right"
+        className="w-3 h-3 !bg-uml-enum hover:!bg-uml-enum/80" 
+      />
+      <Handle 
+        type="source" 
+        position={Position.Bottom} 
+        id="bottom"
+        className="w-3 h-3 !bg-uml-enum hover:!bg-uml-enum/80" 
+      />
 
       {/* Header */}
       <div className="flex items-center gap-2 px-3 py-2 bg-uml-enum rounded-t-md">

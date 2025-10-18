@@ -45,7 +45,31 @@ export const UMLClassNode = memo(({ data, type, id }: NodeProps) => {
 
   return (
     <div className={`rounded-lg border-2 bg-card shadow-lg min-w-[240px]`} style={{ borderColor: `hsl(var(--${color}))` }}>
-      {/* Handles removed for now - will implement proper connection system later */}
+      {/* Connection Handles */}
+      <Handle 
+        type="target" 
+        position={Position.Top} 
+        id="top"
+        className="w-3 h-3 !bg-primary hover:!bg-primary/80" 
+      />
+      <Handle 
+        type="target" 
+        position={Position.Left} 
+        id="left"
+        className="w-3 h-3 !bg-primary hover:!bg-primary/80" 
+      />
+      <Handle 
+        type="source" 
+        position={Position.Right} 
+        id="right"
+        className="w-3 h-3 !bg-primary hover:!bg-primary/80" 
+      />
+      <Handle 
+        type="source" 
+        position={Position.Bottom} 
+        id="bottom"
+        className="w-3 h-3 !bg-primary hover:!bg-primary/80" 
+      />
 
       {/* Header */}
       <div className={`flex items-center gap-2 px-3 py-2 rounded-t-md`} style={{ backgroundColor: `hsl(var(--${color}))` }}>
