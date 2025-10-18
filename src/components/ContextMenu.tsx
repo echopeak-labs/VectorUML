@@ -81,6 +81,7 @@ export function ContextMenu({ x, y, onClose, onCreateNode }: ContextMenuProps) {
     { type: 'enum', ...nodeTypeConfig.enum },
     { type: 'package', ...nodeTypeConfig.package },
     { type: 'note', ...nodeTypeConfig.note },
+    { type: 'markdown', ...nodeTypeConfig.markdown },
     { type: 'actor', ...nodeTypeConfig.actor },
     { type: 'usecase', ...nodeTypeConfig.usecase },
     { type: 'component', ...nodeTypeConfig.component },

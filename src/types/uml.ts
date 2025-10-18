@@ -5,6 +5,7 @@ export type NodeType =
   | 'enum' 
   | 'package' 
   | 'note' 
+  | 'markdown'
   | 'actor' 
   | 'usecase' 
   | 'component'

@@ -17,6 +17,7 @@ import { Diagram } from '@/types/uml';
 import { UMLClassNode } from './nodes/UMLClassNode';
 import { UMLInterfaceNode } from './nodes/UMLInterfaceNode';
 import { UMLNoteNode } from './nodes/UMLNoteNode';
+import { MarkdownNode } from './nodes/MarkdownNode';
 import { UMLEnumNode } from './nodes/UMLEnumNode';
 import { AWSS3Node } from './nodes/AWSS3Node';
 import { AWSECRNode } from './nodes/AWSECRNode';
@@ -45,6 +46,7 @@ const nodeTypes = {
   abstract: UMLClassNode,
   enum: UMLEnumNode,
   note: UMLNoteNode,
+  markdown: MarkdownNode,
   package: UMLClassNode,
   actor: UMLClassNode,
   usecase: UMLClassNode,
@@ -92,7 +94,7 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
         type: node.type,
         position: node.position,
         data: { ...node.data }, // Clone data to prevent mutations
-        ...(node.type === 'note' ? {
+        ...(node.type === 'note' || node.type === 'markdown' ? {
           width: node.size?.w || 250,
           height: node.size?.h || 150,
         } : {}),
@@ -196,9 +198,9 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
           fields: type === 'class' || type === 'abstract' ? [] : undefined,
           methods: type === 'class' || type === 'interface' || type === 'abstract' ? [] : undefined,
           values: type === 'enum' ? [] : undefined,
-          text: type === 'note' ? 'Note text' : undefined,
+          text: type === 'note' || type === 'markdown' ? 'Note text' : undefined,
         },
-        ...(type === 'note' ? {
+        ...(type === 'note' || type === 'markdown' ? {
           width: 250,
           height: 150,
         } : {}),
