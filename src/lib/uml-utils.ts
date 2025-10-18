@@ -8,7 +8,20 @@ import {
   Package, 
   Square, 
   Tag, 
-  User 
+  User,
+  Server,
+  Database,
+  Zap,
+  ArrowRightLeft,
+  Container,
+  Archive,
+  Users,
+  HardDrive,
+  Scale,
+  Github,
+  CircleDot,
+  Hammer,
+  GitBranch
 } from 'lucide-react';
 
 export const nodeTypeConfig = {
@@ -21,6 +34,22 @@ export const nodeTypeConfig = {
   actor: { icon: User, color: 'uml-actor', label: 'Actor' },
   usecase: { icon: Circle, color: 'uml-usecase', label: 'Use Case' },
   component: { icon: Component, color: 'uml-component', label: 'Component' },
+  'api-server': { icon: Server, color: 'uml-component', label: 'API Server' },
+  'database': { icon: Database, color: 'uml-package', label: 'Database' },
+  'aws-lambda': { icon: Zap, color: 'uml-class', label: 'AWS Lambda' },
+  'aws-api-gateway': { icon: ArrowRightLeft, color: 'uml-interface', label: 'AWS API Gateway' },
+  'aws-dynamodb': { icon: Database, color: 'uml-package', label: 'AWS DynamoDB' },
+  'aws-ecs': { icon: Container, color: 'uml-component', label: 'AWS ECS' },
+  'aws-ecr': { icon: Archive, color: 'uml-package', label: 'AWS ECR' },
+  'aws-amplify': { icon: Zap, color: 'uml-actor', label: 'AWS Amplify' },
+  'aws-cognito': { icon: Users, color: 'uml-actor', label: 'AWS Cognito' },
+  'aws-s3': { icon: HardDrive, color: 'uml-package', label: 'AWS S3' },
+  'aws-alb': { icon: Scale, color: 'uml-interface', label: 'AWS ALB' },
+  'aws-ec2': { icon: Server, color: 'uml-component', label: 'AWS EC2' },
+  'github-actions': { icon: Github, color: 'uml-class', label: 'Github Actions' },
+  'circleci': { icon: CircleDot, color: 'uml-class', label: 'CircleCI' },
+  'aws-codebuild': { icon: Hammer, color: 'uml-class', label: 'AWS CodeBuild' },
+  'aws-codepipeline': { icon: GitBranch, color: 'uml-interface', label: 'AWS CodePipeline' },
 } as const;
 
 export const relationTypeConfig = {

@@ -7,7 +7,23 @@ export type NodeType =
   | 'note' 
   | 'actor' 
   | 'usecase' 
-  | 'component';
+  | 'component'
+  | 'api-server'
+  | 'database'
+  | 'aws-lambda'
+  | 'aws-api-gateway'
+  | 'aws-dynamodb'
+  | 'aws-ecs'
+  | 'aws-ecr'
+  | 'aws-amplify'
+  | 'aws-cognito'
+  | 'aws-s3'
+  | 'aws-alb'
+  | 'aws-ec2'
+  | 'github-actions'
+  | 'circleci'
+  | 'aws-codebuild'
+  | 'aws-codepipeline';
 
 export type RelationType = 
   | 'association' 

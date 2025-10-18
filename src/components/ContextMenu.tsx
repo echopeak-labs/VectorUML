@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { nodeTypeConfig } from '@/lib/uml-utils';
-import { ArrowRight, Circle as CircleIcon, Diamond, Triangle } from 'lucide-react';
 
 interface ContextMenuProps {
   x: number;
@@ -49,15 +48,28 @@ export function ContextMenu({ x, y, onClose, onCreateNode }: ContextMenuProps) {
     { type: 'actor', ...nodeTypeConfig.actor },
     { type: 'usecase', ...nodeTypeConfig.usecase },
     { type: 'component', ...nodeTypeConfig.component },
+    { type: 'api-server', ...nodeTypeConfig['api-server'] },
+    { type: 'database', ...nodeTypeConfig.database },
   ];
 
-  const relations = [
-    { type: 'association', label: 'Association', icon: ArrowRight },
-    { type: 'aggregation', label: 'Aggregation', icon: Diamond },
-    { type: 'composition', label: 'Composition', icon: Diamond },
-    { type: 'inheritance', label: 'Inheritance', icon: Triangle },
-    { type: 'realization', label: 'Realization', icon: Triangle },
-    { type: 'dependency', label: 'Dependency', icon: ArrowRight },
+  const awsNodes = [
+    { type: 'aws-lambda', ...nodeTypeConfig['aws-lambda'] },
+    { type: 'aws-api-gateway', ...nodeTypeConfig['aws-api-gateway'] },
+    { type: 'aws-dynamodb', ...nodeTypeConfig['aws-dynamodb'] },
+    { type: 'aws-ecs', ...nodeTypeConfig['aws-ecs'] },
+    { type: 'aws-ecr', ...nodeTypeConfig['aws-ecr'] },
+    { type: 'aws-amplify', ...nodeTypeConfig['aws-amplify'] },
+    { type: 'aws-cognito', ...nodeTypeConfig['aws-cognito'] },
+    { type: 'aws-s3', ...nodeTypeConfig['aws-s3'] },
+    { type: 'aws-alb', ...nodeTypeConfig['aws-alb'] },
+    { type: 'aws-ec2', ...nodeTypeConfig['aws-ec2'] },
+  ];
+
+  const pipelineNodes = [
+    { type: 'github-actions', ...nodeTypeConfig['github-actions'] },
+    { type: 'circleci', ...nodeTypeConfig.circleci },
+    { type: 'aws-codebuild', ...nodeTypeConfig['aws-codebuild'] },
+    { type: 'aws-codepipeline', ...nodeTypeConfig['aws-codepipeline'] },
   ];
 
   return (
@@ -66,7 +78,7 @@ export function ContextMenu({ x, y, onClose, onCreateNode }: ContextMenuProps) {
       className="fixed z-50 w-64 p-2 shadow-xl border-border bg-popover"
       style={{ left: x, top: y }}
     >
-      <div className="space-y-3">
+      <div className="space-y-3 max-h-[500px] overflow-y-auto">
         <div>
           <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">Common</div>
           <div className="space-y-1">
@@ -87,21 +99,37 @@ export function ContextMenu({ x, y, onClose, onCreateNode }: ContextMenuProps) {
         </div>
 
         <div className="border-t border-border pt-2">
-          <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">Relations</div>
+          <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">AWS</div>
           <div className="space-y-1">
-            {relations.map((relation) => {
-              const Icon = relation.icon;
+            {awsNodes.map((node) => {
+              const Icon = node.icon;
               return (
                 <button
-                  key={relation.type}
-                  onClick={() => {
-                    // Relations are created by dragging from handles
-                    onClose();
-                  }}
+                  key={node.type}
+                  onClick={() => onCreateNode(node.type)}
                   className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-accent transition-colors"
                 >
-                  <Icon className="h-4 w-4 text-muted-foreground" />
-                  <span>{relation.label}</span>
+                  <Icon className="h-4 w-4" style={{ color: `hsl(var(--${node.color}))` }} />
+                  <span>{node.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="border-t border-border pt-2">
+          <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">Pipeline</div>
+          <div className="space-y-1">
+            {pipelineNodes.map((node) => {
+              const Icon = node.icon;
+              return (
+                <button
+                  key={node.type}
+                  onClick={() => onCreateNode(node.type)}
+                  className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-accent transition-colors"
+                >
+                  <Icon className="h-4 w-4" style={{ color: `hsl(var(--${node.color}))` }} />
+                  <span>{node.label}</span>
                 </button>
               );
             })}
