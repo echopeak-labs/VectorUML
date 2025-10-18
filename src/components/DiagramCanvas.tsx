@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import {
   ReactFlow,
   Background,
@@ -36,7 +36,7 @@ import { GenericAWSNode } from './nodes/GenericAWSNode';
 import { ContextMenu } from './ContextMenu';
 import { EdgeLabelDialog } from './EdgeLabelDialog';
 import { Button } from './ui/button';
-import { Download, Upload, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
+import { Download, Upload, Undo, Redo } from 'lucide-react';
 import { toast } from 'sonner';
 import { exportDiagramToJSON, importDiagramFromJSON } from '@/lib/uml-utils';
 
@@ -86,6 +86,60 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
     currentLabel: '',
   });
 
+  // Undo/Redo state
+  const [history, setHistory] = useState<Array<{ nodes: Node[]; edges: Edge[] }>>([]);
+  const [currentHistoryIndex, setCurrentHistoryIndex] = useState(-1);
+  const isRestoringFromHistory = useRef(false);
+
+  // Save to history when nodes or edges change
+  useEffect(() => {
+    if (nodes.length === 0 && edges.length === 0) return;
+    if (isRestoringFromHistory.current) {
+      isRestoringFromHistory.current = false;
+      return;
+    }
+
+    const newHistoryEntry = { 
+      nodes: JSON.parse(JSON.stringify(nodes)), 
+      edges: JSON.parse(JSON.stringify(edges)) 
+    };
+
+    setHistory(prev => {
+      // Remove any history after current index (when making new changes after undo)
+      const newHistory = prev.slice(0, currentHistoryIndex + 1);
+      newHistory.push(newHistoryEntry);
+      // Keep only last 50 states
+      return newHistory.slice(-50);
+    });
+
+    setCurrentHistoryIndex(prev => {
+      const newHistory = history.slice(0, prev + 1);
+      return Math.min(newHistory.length, 49);
+    });
+  }, [nodes, edges]);
+
+  // Undo function
+  const handleUndo = useCallback(() => {
+    if (currentHistoryIndex > 0) {
+      isRestoringFromHistory.current = true;
+      const previousState = history[currentHistoryIndex - 1];
+      setNodes(previousState.nodes);
+      setEdges(previousState.edges);
+      setCurrentHistoryIndex(prev => prev - 1);
+    }
+  }, [currentHistoryIndex, history, setNodes, setEdges]);
+
+  // Redo function
+  const handleRedo = useCallback(() => {
+    if (currentHistoryIndex < history.length - 1) {
+      isRestoringFromHistory.current = true;
+      const nextState = history[currentHistoryIndex + 1];
+      setNodes(nextState.nodes);
+      setEdges(nextState.edges);
+      setCurrentHistoryIndex(prev => prev + 1);
+    }
+  }, [currentHistoryIndex, history, setNodes, setEdges]);
+
   // Convert diagram data to React Flow format only when diagram changes
   useEffect(() => {
     if (diagram) {
@@ -129,6 +183,20 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
   // Handle delete key press for selected edges and nodes
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      // Handle Undo (Ctrl+Z or Cmd+Z)
+      if ((event.ctrlKey || event.metaKey) && event.key === 'z' && !event.shiftKey) {
+        event.preventDefault();
+        handleUndo();
+        return;
+      }
+
+      // Handle Redo (Ctrl+Y or Ctrl+Shift+Z or Cmd+Shift+Z)
+      if ((event.ctrlKey || event.metaKey) && (event.key === 'y' || (event.shiftKey && event.key === 'z'))) {
+        event.preventDefault();
+        handleRedo();
+        return;
+      }
+
       // Only trigger on Delete key (not Backspace)
       if (event.key !== 'Delete') return;
 
@@ -147,7 +215,7 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [setEdges, setNodes]);
+  }, [setEdges, setNodes, handleUndo, handleRedo]);
 
   // Handle double-click on edge to add/edit label
   const onEdgeDoubleClick = useCallback(
@@ -343,6 +411,26 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
           className="bg-card border border-border"
         />
         <Panel position="top-right" className="flex gap-2">
+          <Button 
+            size="sm" 
+            variant="secondary" 
+            onClick={handleUndo}
+            disabled={currentHistoryIndex <= 0}
+            title="Undo (Ctrl+Z)"
+          >
+            <Undo className="mr-2 h-4 w-4" />
+            Undo
+          </Button>
+          <Button 
+            size="sm" 
+            variant="secondary" 
+            onClick={handleRedo}
+            disabled={currentHistoryIndex >= history.length - 1}
+            title="Redo (Ctrl+Y)"
+          >
+            <Redo className="mr-2 h-4 w-4" />
+            Redo
+          </Button>
           <Button size="sm" variant="secondary" onClick={handleExport}>
             <Download className="mr-2 h-4 w-4" />
             Export
