@@ -62,6 +62,9 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
         type: node.type,
         position: node.position,
         data: { ...node.data }, // Clone data to prevent mutations
+        ...(node.type === 'note' && node.size ? {
+          style: { width: node.size.w, height: node.size.h },
+        } : {}),
       }));
 
       const flowEdges: Edge[] = diagram.edges.map((edge) => ({
@@ -218,15 +221,21 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
     if (nodes.length === 0 && edges.length === 0) return;
     
     const saveTimeout = setTimeout(() => {
-      const updatedNodes = nodes.map((node) => ({
-        id: node.id,
-        type: node.type as any,
-        icon: node.type,
-        position: node.position,
-        size: { w: 240, h: 120 },
-        connectors: ['top', 'right', 'bottom', 'left'] as any,
-        data: node.data,
-      }));
+      const updatedNodes = nodes.map((node) => {
+        const baseNode = {
+          id: node.id,
+          type: node.type as any,
+          icon: node.type,
+          position: node.position,
+          size: { 
+            w: node.style?.width ? Number(node.style.width) : 240, 
+            h: node.style?.height ? Number(node.style.height) : 120 
+          },
+          connectors: ['top', 'right', 'bottom', 'left'] as any,
+          data: node.data,
+        };
+        return baseNode;
+      });
 
       const updatedEdges = edges.map((edge) => ({
         id: edge.id,
