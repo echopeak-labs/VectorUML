@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Project, Diagram } from '@/types/uml';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   AlertDialog,
@@ -13,6 +14,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { 
   Plus, 
   FolderOpen, 
@@ -48,6 +57,9 @@ export function ProjectSidebar({
   const [newName, setNewName] = useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [diagramToDelete, setDiagramToDelete] = useState<{ projectId: string; diagramId: string } | null>(null);
+  const [createDiagramDialogOpen, setCreateDiagramDialogOpen] = useState(false);
+  const [projectIdForNewDiagram, setProjectIdForNewDiagram] = useState<string | null>(null);
+  const [newDiagramName, setNewDiagramName] = useState('');
 
   const toggleProject = (projectId: string) => {
     const newExpanded = new Set(expandedProjects);
@@ -69,12 +81,20 @@ export function ProjectSidebar({
   };
 
   const handleCreateDiagram = (projectId: string) => {
-    const name = prompt('Enter diagram name:');
-    if (name?.trim()) {
-      storage.createDiagram(projectId, name.trim());
+    setProjectIdForNewDiagram(projectId);
+    setNewDiagramName('');
+    setCreateDiagramDialogOpen(true);
+  };
+
+  const confirmCreateDiagram = () => {
+    if (projectIdForNewDiagram && newDiagramName.trim()) {
+      storage.createDiagram(projectIdForNewDiagram, newDiagramName.trim());
       onProjectsUpdate();
       toast.success('Diagram created');
+      setProjectIdForNewDiagram(null);
+      setNewDiagramName('');
     }
+    setCreateDiagramDialogOpen(false);
   };
 
   const handleDeleteProject = (projectId: string, e: React.MouseEvent) => {
@@ -282,6 +302,43 @@ export function ProjectSidebar({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={createDiagramDialogOpen} onOpenChange={setCreateDiagramDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Create New Diagram</DialogTitle>
+            <DialogDescription>
+              Enter a name for your new diagram
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="diagram-name">Diagram Name</Label>
+              <Input
+                id="diagram-name"
+                value={newDiagramName}
+                onChange={(e) => setNewDiagramName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && newDiagramName.trim()) {
+                    confirmCreateDiagram();
+                  }
+                }}
+                placeholder="Enter diagram name"
+                autoFocus
+                maxLength={100}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCreateDiagramDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={confirmCreateDiagram} disabled={!newDiagramName.trim()}>
+              Create
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
