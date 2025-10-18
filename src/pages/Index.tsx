@@ -12,13 +12,25 @@ const Index = () => {
   const [selectedDiagram, setSelectedDiagram] = useState<Diagram | null>(null);
 
   useEffect(() => {
-    // Initialize with seed data if no projects exist
+    // Initialize with seed data if no projects exist, or replace old example project
     let loadedProjects = storage.getProjects();
+    
+    // Check if there's an "Example UML Project" and replace it with new demo data
+    const hasOldExample = loadedProjects.some(p => p.name === 'Example UML Project');
+    
     if (loadedProjects.length === 0) {
       storage.saveProjects([seedProject]);
       loadedProjects = [seedProject];
-      toast.success('Welcome! Loaded example project with 2 diagrams');
+      toast.success('Welcome! Loaded demo project with AWS serverless workflow');
+    } else if (hasOldExample) {
+      // Replace the old example project with new demo project
+      loadedProjects = loadedProjects.map(p => 
+        p.name === 'Example UML Project' ? seedProject : p
+      );
+      storage.saveProjects(loadedProjects);
+      toast.success('Updated to new Demo UML Project');
     }
+    
     setProjects(loadedProjects);
     
     // Select first project and diagram by default
