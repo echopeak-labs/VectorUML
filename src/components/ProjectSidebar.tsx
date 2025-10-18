@@ -1,0 +1,253 @@
+import { useState } from 'react';
+import { Project, Diagram } from '@/types/uml';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { 
+  Plus, 
+  FolderOpen, 
+  FileText, 
+  Trash2, 
+  Edit2, 
+  ChevronRight, 
+  ChevronDown 
+} from 'lucide-react';
+import { storage } from '@/lib/storage';
+import { toast } from 'sonner';
+
+interface ProjectSidebarProps {
+  projects: Project[];
+  selectedProject: Project | null;
+  selectedDiagram: Diagram | null;
+  onProjectSelect: (project: Project) => void;
+  onDiagramSelect: (diagram: Diagram) => void;
+  onProjectsUpdate: () => void;
+}
+
+export function ProjectSidebar({
+  projects,
+  selectedProject,
+  selectedDiagram,
+  onProjectSelect,
+  onDiagramSelect,
+  onProjectsUpdate,
+}: ProjectSidebarProps) {
+  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
+  const [editingProject, setEditingProject] = useState<string | null>(null);
+  const [editingDiagram, setEditingDiagram] = useState<string | null>(null);
+  const [newName, setNewName] = useState('');
+
+  const toggleProject = (projectId: string) => {
+    const newExpanded = new Set(expandedProjects);
+    if (newExpanded.has(projectId)) {
+      newExpanded.delete(projectId);
+    } else {
+      newExpanded.add(projectId);
+    }
+    setExpandedProjects(newExpanded);
+  };
+
+  const handleCreateProject = () => {
+    const name = prompt('Enter project name:');
+    if (name?.trim()) {
+      storage.createProject(name.trim());
+      onProjectsUpdate();
+      toast.success('Project created');
+    }
+  };
+
+  const handleCreateDiagram = (projectId: string) => {
+    const name = prompt('Enter diagram name:');
+    if (name?.trim()) {
+      storage.createDiagram(projectId, name.trim());
+      onProjectsUpdate();
+      toast.success('Diagram created');
+    }
+  };
+
+  const handleDeleteProject = (projectId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (confirm('Delete this project and all its diagrams?')) {
+      storage.deleteProject(projectId);
+      onProjectsUpdate();
+      toast.success('Project deleted');
+    }
+  };
+
+  const handleDeleteDiagram = (projectId: string, diagramId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (confirm('Delete this diagram?')) {
+      storage.deleteDiagram(projectId, diagramId);
+      onProjectsUpdate();
+      toast.success('Diagram deleted');
+    }
+  };
+
+  const handleRenameProject = (projectId: string, newName: string) => {
+    if (newName.trim()) {
+      storage.updateProject(projectId, { name: newName.trim() });
+      onProjectsUpdate();
+      toast.success('Project renamed');
+    }
+    setEditingProject(null);
+  };
+
+  const handleRenameDiagram = (projectId: string, diagramId: string, newName: string) => {
+    if (newName.trim()) {
+      storage.updateDiagram(projectId, diagramId, { name: newName.trim() });
+      onProjectsUpdate();
+      toast.success('Diagram renamed');
+    }
+    setEditingDiagram(null);
+  };
+
+  return (
+    <div className="flex h-full w-64 flex-col border-r border-sidebar-border bg-sidebar">
+      <div className="border-b border-sidebar-border p-4">
+        <h2 className="mb-3 text-lg font-semibold text-sidebar-foreground">Projects</h2>
+        <Button onClick={handleCreateProject} size="sm" className="w-full">
+          <Plus className="mr-2 h-4 w-4" />
+          New Project
+        </Button>
+      </div>
+
+      <ScrollArea className="flex-1">
+        <div className="p-2">
+          {projects.map((project) => (
+            <div key={project.id} className="mb-2">
+              <div
+                className={`flex items-center justify-between rounded-md p-2 hover:bg-sidebar-accent cursor-pointer ${
+                  selectedProject?.id === project.id ? 'bg-sidebar-accent' : ''
+                }`}
+                onClick={() => {
+                  onProjectSelect(project);
+                  toggleProject(project.id);
+                }}
+              >
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleProject(project.id);
+                    }}
+                    className="shrink-0"
+                  >
+                    {expandedProjects.has(project.id) ? (
+                      <ChevronDown className="h-4 w-4" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4" />
+                    )}
+                  </button>
+                  <FolderOpen className="h-4 w-4 shrink-0" />
+                  {editingProject === project.id ? (
+                    <Input
+                      value={newName}
+                      onChange={(e) => setNewName(e.target.value)}
+                      onBlur={() => handleRenameProject(project.id, newName)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleRenameProject(project.id, newName);
+                        if (e.key === 'Escape') setEditingProject(null);
+                      }}
+                      className="h-6 py-0 text-sm"
+                      autoFocus
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  ) : (
+                    <span className="truncate text-sm">{project.name}</span>
+                  )}
+                </div>
+                <div className="flex gap-1 shrink-0">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setNewName(project.name);
+                      setEditingProject(project.id);
+                    }}
+                  >
+                    <Edit2 className="h-3 w-3" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6"
+                    onClick={(e) => handleDeleteProject(project.id, e)}
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
+                </div>
+              </div>
+
+              {expandedProjects.has(project.id) && (
+                <div className="ml-6 mt-1 space-y-1">
+                  {project.diagrams.map((diagram) => (
+                    <div
+                      key={diagram.id}
+                      className={`flex items-center justify-between rounded-md p-2 hover:bg-sidebar-accent cursor-pointer ${
+                        selectedDiagram?.id === diagram.id ? 'bg-sidebar-accent' : ''
+                      }`}
+                      onClick={() => onDiagramSelect(diagram)}
+                    >
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        <FileText className="h-3 w-3 shrink-0" />
+                        {editingDiagram === diagram.id ? (
+                          <Input
+                            value={newName}
+                            onChange={(e) => setNewName(e.target.value)}
+                            onBlur={() => handleRenameDiagram(project.id, diagram.id, newName)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') handleRenameDiagram(project.id, diagram.id, newName);
+                              if (e.key === 'Escape') setEditingDiagram(null);
+                            }}
+                            className="h-6 py-0 text-xs"
+                            autoFocus
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        ) : (
+                          <span className="truncate text-xs">{diagram.name}</span>
+                        )}
+                      </div>
+                      <div className="flex gap-1 shrink-0">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-5 w-5"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setNewName(diagram.name);
+                            setEditingDiagram(diagram.id);
+                          }}
+                        >
+                          <Edit2 className="h-2.5 w-2.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-5 w-5"
+                          onClick={(e) => handleDeleteDiagram(project.id, diagram.id, e)}
+                        >
+                          <Trash2 className="h-2.5 w-2.5" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full justify-start text-xs h-7"
+                    onClick={() => handleCreateDiagram(project.id)}
+                  >
+                    <Plus className="mr-2 h-3 w-3" />
+                    New Diagram
+                  </Button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </ScrollArea>
+    </div>
+  );
+}

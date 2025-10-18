@@ -1,0 +1,232 @@
+import { useCallback, useEffect, useState } from 'react';
+import {
+  ReactFlow,
+  Background,
+  Controls,
+  MiniMap,
+  useNodesState,
+  useEdgesState,
+  addEdge,
+  Connection,
+  Node,
+  Edge,
+  BackgroundVariant,
+  Panel,
+} from '@xyflow/react';
+import '@xyflow/react/dist/style.css';
+import { Diagram } from '@/types/uml';
+import { UMLClassNode } from './nodes/UMLClassNode';
+import { UMLInterfaceNode } from './nodes/UMLInterfaceNode';
+import { UMLNoteNode } from './nodes/UMLNoteNode';
+import { UMLEnumNode } from './nodes/UMLEnumNode';
+import { ContextMenu } from './ContextMenu';
+import { Button } from './ui/button';
+import { Download, Upload, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
+import { toast } from 'sonner';
+import { exportDiagramToJSON, importDiagramFromJSON } from '@/lib/uml-utils';
+
+const nodeTypes = {
+  class: UMLClassNode,
+  interface: UMLInterfaceNode,
+  abstract: UMLClassNode,
+  enum: UMLEnumNode,
+  note: UMLNoteNode,
+  package: UMLClassNode,
+  actor: UMLClassNode,
+  usecase: UMLClassNode,
+  component: UMLClassNode,
+};
+
+interface DiagramCanvasProps {
+  diagram: Diagram;
+  projectId: string;
+  onDiagramUpdate: (updates: Partial<Diagram>) => void;
+}
+
+export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCanvasProps) {
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
+  const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
+
+  // Convert diagram data to React Flow format
+  useEffect(() => {
+    if (diagram) {
+      const flowNodes: Node[] = diagram.nodes.map((node) => ({
+        id: node.id,
+        type: node.type,
+        position: node.position,
+        data: node.data,
+      }));
+
+      const flowEdges: Edge[] = diagram.edges.map((edge) => ({
+        id: edge.id,
+        source: edge.from.nodeId,
+        target: edge.to.nodeId,
+        type: edge.style.dashed ? 'step' : 'smoothstep',
+        animated: false,
+        label: edge.labels.center,
+      }));
+
+      setNodes(flowNodes);
+      setEdges(flowEdges);
+    }
+  }, [diagram, setNodes, setEdges]);
+
+  const onConnect = useCallback(
+    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
+    [setEdges]
+  );
+
+  const handleContextMenu = useCallback((event: React.MouseEvent) => {
+    event.preventDefault();
+    setContextMenu({
+      x: event.clientX,
+      y: event.clientY,
+    });
+  }, []);
+
+  const handleCreateNode = useCallback(
+    (type: string) => {
+      if (!reactFlowInstance) return;
+
+      const position = reactFlowInstance.screenToFlowPosition({
+        x: contextMenu?.x || 0,
+        y: contextMenu?.y || 0,
+      });
+
+      const newNode: Node = {
+        id: crypto.randomUUID(),
+        type,
+        position,
+        data: {
+          name: `New ${type.charAt(0).toUpperCase() + type.slice(1)}`,
+          fields: type === 'class' || type === 'abstract' ? [] : undefined,
+          methods: type === 'class' || type === 'interface' || type === 'abstract' ? [] : undefined,
+          values: type === 'enum' ? [] : undefined,
+          text: type === 'note' ? 'Note text' : undefined,
+        },
+      };
+
+      setNodes((nds) => [...nds, newNode]);
+      setContextMenu(null);
+      toast.success(`${type} node created`);
+    },
+    [contextMenu, reactFlowInstance, setNodes]
+  );
+
+  const handleExport = useCallback(() => {
+    const exportData = exportDiagramToJSON(diagram, projectId);
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${diagram.name}.json`;
+    a.click();
+    toast.success('Diagram exported');
+  }, [diagram, projectId]);
+
+  const handleImport = useCallback(() => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const imported = importDiagramFromJSON(e.target?.result as string);
+            onDiagramUpdate({
+              nodes: imported.nodes,
+              edges: imported.edges,
+              settings: imported.settings,
+            });
+            toast.success('Diagram imported');
+          } catch (error) {
+            toast.error('Failed to import diagram');
+          }
+        };
+        reader.readAsText(file);
+      }
+    };
+    input.click();
+  }, [onDiagramUpdate]);
+
+  // Save changes back to diagram
+  useEffect(() => {
+    const saveTimeout = setTimeout(() => {
+      if (nodes.length > 0 || edges.length > 0) {
+        const updatedNodes = nodes.map((node) => ({
+          id: node.id,
+          type: node.type as any,
+          icon: node.type,
+          position: node.position,
+          size: { w: 240, h: 120 },
+          connectors: ['top', 'right', 'bottom', 'left'] as any,
+          data: node.data,
+        }));
+
+        const updatedEdges = edges.map((edge) => ({
+          id: edge.id,
+          from: { nodeId: edge.source, port: 'right' as any },
+          to: { nodeId: edge.target, port: 'left' as any },
+          relation: 'association' as any,
+          labels: { center: edge.label as string },
+          style: { dashed: edge.type === 'step' },
+        }));
+
+        onDiagramUpdate({
+          nodes: updatedNodes,
+          edges: updatedEdges,
+        });
+      }
+    }, 500);
+
+    return () => clearTimeout(saveTimeout);
+  }, [nodes, edges, onDiagramUpdate]);
+
+  return (
+    <div className="h-full w-full" onContextMenu={handleContextMenu}>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        onInit={setReactFlowInstance}
+        nodeTypes={nodeTypes}
+        fitView
+        className="bg-canvas"
+      >
+        <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="hsl(var(--grid))" />
+        <Controls />
+        <MiniMap
+          nodeColor={(node) => {
+            return `hsl(var(--uml-${node.type}))`;
+          }}
+          className="bg-card border border-border"
+        />
+        <Panel position="top-right" className="flex gap-2">
+          <Button size="sm" variant="secondary" onClick={handleExport}>
+            <Download className="mr-2 h-4 w-4" />
+            Export
+          </Button>
+          <Button size="sm" variant="secondary" onClick={handleImport}>
+            <Upload className="mr-2 h-4 w-4" />
+            Import
+          </Button>
+        </Panel>
+      </ReactFlow>
+
+      {contextMenu && (
+        <ContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          onClose={() => setContextMenu(null)}
+          onCreateNode={handleCreateNode}
+        />
+      )}
+    </div>
+  );
+}
