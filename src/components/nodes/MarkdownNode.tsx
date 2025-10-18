@@ -1,11 +1,16 @@
-import { memo, useState, useCallback } from 'react';
+import { memo, useState, useCallback, useMemo } from 'react';
 import { NodeProps, NodeResizer } from '@xyflow/react';
 import { FileCode } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
+import { marked } from 'marked';
 
 export const MarkdownNode = memo(({ data, selected }: NodeProps) => {
   const [localText, setLocalText] = useState<string>((data as any).text || '');
   const [isFocused, setIsFocused] = useState(false);
+
+  const renderedMarkdown = useMemo(() => {
+    if (!localText) return '';
+    return marked(localText, { breaks: true, gfm: true });
+  }, [localText]);
 
   const handleTextChange = useCallback((newText: string) => {
     setLocalText(newText);
@@ -43,14 +48,11 @@ export const MarkdownNode = memo(({ data, selected }: NodeProps) => {
         ) : (
           <div
             onClick={() => setIsFocused(true)}
-            className="prose prose-sm prose-invert max-w-none cursor-text h-full"
-          >
-            {localText ? (
-              <ReactMarkdown>{localText}</ReactMarkdown>
-            ) : (
-              <p className="text-muted-foreground text-xs">Click to enter markdown...</p>
-            )}
-          </div>
+            className="prose prose-sm prose-invert max-w-none cursor-text h-full overflow-auto"
+            dangerouslySetInnerHTML={{ 
+              __html: localText ? renderedMarkdown : '<p class="text-muted-foreground text-xs">Click to enter markdown...</p>' 
+            }}
+          />
         )}
       </div>
     </div>
