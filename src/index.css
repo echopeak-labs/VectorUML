@@ -71,4 +71,15 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
   }
+
+  /* React Flow edge selection styling */
+  .react-flow__edge.selected .react-flow__edge-path {
+    stroke: hsl(var(--accent)) !important;
+    stroke-width: 3 !important;
+  }
+
+  .react-flow__edge:hover .react-flow__edge-path {
+    stroke: hsl(var(--accent)) !important;
+    stroke-width: 2.5 !important;
+  }
 }

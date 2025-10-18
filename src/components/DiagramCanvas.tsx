@@ -79,10 +79,24 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
         ...params,
         type: 'smoothstep',
         animated: false,
+        style: { stroke: 'hsl(var(--primary))', strokeWidth: 2 },
       }, eds));
     },
     [setEdges]
   );
+
+  // Handle delete key press for selected edges
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Delete' || event.key === 'Backspace') {
+        setEdges((eds) => eds.filter((edge) => !edge.selected));
+        setNodes((nds) => nds.filter((node) => !node.selected));
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [setEdges, setNodes]);
 
   const handleContextMenu = useCallback((event: React.MouseEvent) => {
     event.preventDefault();
@@ -214,6 +228,12 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
         nodesDraggable={true}
         nodesConnectable={true}
         elementsSelectable={true}
+        edgesFocusable={true}
+        defaultEdgeOptions={{
+          type: 'smoothstep',
+          style: { stroke: 'hsl(var(--primary))', strokeWidth: 2 },
+          focusable: true,
+        }}
       >
         <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="hsl(var(--grid))" />
         <Controls />
