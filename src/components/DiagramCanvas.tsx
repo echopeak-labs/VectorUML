@@ -20,6 +20,7 @@ import { UMLInterfaceNode } from './nodes/UMLInterfaceNode';
 import { UMLNoteNode } from './nodes/UMLNoteNode';
 import { UMLEnumNode } from './nodes/UMLEnumNode';
 import { ContextMenu } from './ContextMenu';
+import { EdgeLabelDialog } from './EdgeLabelDialog';
 import { Button } from './ui/button';
 import { Download, Upload, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
 import { toast } from 'sonner';
@@ -48,6 +49,11 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
+  const [labelDialog, setLabelDialog] = useState<{ open: boolean; edgeId: string; currentLabel: string }>({
+    open: false,
+    edgeId: '',
+    currentLabel: '',
+  });
 
   // Convert diagram data to React Flow format only when diagram changes
   useEffect(() => {
@@ -102,25 +108,32 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
   const onEdgeDoubleClick = useCallback(
     (_event: React.MouseEvent, edge: Edge) => {
       const currentLabel = edge.label as string || '';
-      const newLabel = prompt('Enter edge label:', currentLabel);
-      
-      if (newLabel !== null) {
-        setEdges((eds) =>
-          eds.map((e) =>
-            e.id === edge.id
-              ? { 
-                  ...e, 
-                  label: newLabel,
-                  labelStyle: { fill: 'hsl(var(--foreground))', fontSize: 12 },
-                  labelBgStyle: { fill: 'hsl(var(--card))', fillOpacity: 0.9 },
-                  labelBgPadding: [4, 4] as [number, number],
-                }
-              : e
-          )
-        );
-      }
+      setLabelDialog({
+        open: true,
+        edgeId: edge.id,
+        currentLabel,
+      });
     },
-    [setEdges]
+    []
+  );
+
+  const handleLabelSave = useCallback(
+    (newLabel: string) => {
+      setEdges((eds) =>
+        eds.map((e) =>
+          e.id === labelDialog.edgeId
+            ? { 
+                ...e, 
+                label: newLabel,
+                labelStyle: { fill: 'hsl(var(--foreground))', fontSize: 12 },
+                labelBgStyle: { fill: 'hsl(var(--card))', fillOpacity: 0.9 },
+                labelBgPadding: [4, 4] as [number, number],
+              }
+            : e
+        )
+      );
+    },
+    [labelDialog.edgeId, setEdges]
   );
 
   const handleContextMenu = useCallback((event: React.MouseEvent) => {
@@ -289,6 +302,13 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
           onCreateNode={handleCreateNode}
         />
       )}
+
+      <EdgeLabelDialog
+        open={labelDialog.open}
+        currentLabel={labelDialog.currentLabel}
+        onClose={() => setLabelDialog({ open: false, edgeId: '', currentLabel: '' })}
+        onSave={handleLabelSave}
+      />
     </div>
   );
 }
