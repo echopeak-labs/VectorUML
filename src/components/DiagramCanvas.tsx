@@ -315,6 +315,8 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
         nodesConnectable={true}
         elementsSelectable={true}
         edgesFocusable={true}
+        minZoom={0.25}
+        maxZoom={2}
         defaultEdgeOptions={{
           type: 'smoothstep',
           style: { stroke: 'hsl(var(--primary))', strokeWidth: 2 },
