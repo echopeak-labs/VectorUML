@@ -94,7 +94,7 @@ const Index = () => {
             <div className="border-b border-border px-6 py-3 bg-card">
               <h1 className="text-xl font-semibold text-foreground">{selectedDiagram.name}</h1>
               <p className="text-sm text-muted-foreground">
-                {selectedProject.name} / Right-click to add elements
+                Right-click to add elements
               </p>
             </div>
             <div className="flex-1 overflow-hidden">
