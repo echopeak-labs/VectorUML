@@ -2,150 +2,176 @@ import { Project } from '@/types/uml';
 
 export const seedProject: Project = {
   id: 'seed-project',
-  name: 'Example UML Project',
+  name: 'Demo UML Project',
   createdAt: Date.now(),
   updatedAt: Date.now(),
   diagrams: [
     {
       id: 'diagram-1',
-      name: 'User Authentication System',
+      name: 'AWS Serverless Workflow',
       settings: {
         grid: true,
         snap: true,
         theme: 'dark',
       },
       nodes: [
+        // API Gateway - Entry point
         {
-          id: 'user-class',
-          type: 'class',
-          icon: 'class',
+          id: 'api-gateway',
+          type: 'aws-api-gateway',
+          icon: 'aws-api-gateway',
           position: { x: 100, y: 100 },
-          size: { w: 240, h: 180 },
+          size: { w: 180, h: 80 },
           connectors: ['top', 'right', 'bottom', 'left'],
-          data: {
-            name: 'User',
-            fields: [
-              { visibility: '-', name: 'id', type: 'string' },
-              { visibility: '-', name: 'email', type: 'string' },
-              { visibility: '-', name: 'password', type: 'string' },
-              { visibility: '-', name: 'role', type: 'UserRole' },
-            ],
-            methods: [
-              { visibility: '+', name: 'login', params: [], returns: 'boolean' },
-              { visibility: '+', name: 'logout', params: [], returns: 'void' },
-              { visibility: '+', name: 'validatePassword', params: [], returns: 'boolean' },
-            ],
-          },
+          data: { name: 'API Gateway', text: 'REST API' },
         },
+        // Lambda - Auth
         {
-          id: 'auth-interface',
-          type: 'interface',
-          icon: 'interface',
-          position: { x: 450, y: 100 },
-          size: { w: 240, h: 120 },
+          id: 'lambda-auth',
+          type: 'aws-lambda',
+          icon: 'aws-lambda',
+          position: { x: 350, y: 100 },
+          size: { w: 180, h: 80 },
           connectors: ['top', 'right', 'bottom', 'left'],
-          data: {
-            name: 'IAuthService',
-            methods: [
-              { visibility: '+', name: 'authenticate', params: [], returns: 'Promise<User>' },
-              { visibility: '+', name: 'authorize', params: [], returns: 'boolean' },
-              { visibility: '+', name: 'refreshToken', params: [], returns: 'Promise<string>' },
-            ],
-          },
+          data: { name: 'Auth Lambda', text: 'authenticate' },
         },
+        // Cognito
         {
-          id: 'role-enum',
-          type: 'enum',
-          icon: 'enum',
-          position: { x: 100, y: 350 },
-          size: { w: 200, h: 120 },
+          id: 'cognito',
+          type: 'aws-cognito',
+          icon: 'aws-cognito',
+          position: { x: 350, y: 240 },
+          size: { w: 180, h: 80 },
           connectors: ['top', 'right', 'bottom', 'left'],
-          data: {
-            name: 'UserRole',
-            values: ['ADMIN', 'USER', 'GUEST'],
-          },
+          data: { name: 'Cognito User Pool', text: 'User Management' },
         },
+        // Lambda - Business Logic
         {
-          id: 'note-1',
+          id: 'lambda-processor',
+          type: 'aws-lambda',
+          icon: 'aws-lambda',
+          position: { x: 600, y: 100 },
+          size: { w: 180, h: 80 },
+          connectors: ['top', 'right', 'bottom', 'left'],
+          data: { name: 'Process Lambda', text: 'processRequest' },
+        },
+        // DynamoDB
+        {
+          id: 'dynamodb',
+          type: 'aws-dynamodb',
+          icon: 'aws-dynamodb',
+          position: { x: 850, y: 100 },
+          size: { w: 180, h: 80 },
+          connectors: ['top', 'right', 'bottom', 'left'],
+          data: { name: 'DynamoDB', text: 'Main Database' },
+        },
+        // Lambda - Async Processing
+        {
+          id: 'lambda-async',
+          type: 'aws-lambda',
+          icon: 'aws-lambda',
+          position: { x: 600, y: 280 },
+          size: { w: 180, h: 80 },
+          connectors: ['top', 'right', 'bottom', 'left'],
+          data: { name: 'Async Lambda', text: 'handleEvents' },
+        },
+        // S3
+        {
+          id: 's3-storage',
+          type: 'aws-s3',
+          icon: 'aws-s3',
+          position: { x: 850, y: 280 },
+          size: { w: 180, h: 80 },
+          connectors: ['top', 'right', 'bottom', 'left'],
+          data: { name: 'S3 Bucket', text: 'File Storage' },
+        },
+        // Lambda - Notification
+        {
+          id: 'lambda-notify',
+          type: 'aws-lambda',
+          icon: 'aws-lambda',
+          position: { x: 350, y: 420 },
+          size: { w: 180, h: 80 },
+          connectors: ['top', 'right', 'bottom', 'left'],
+          data: { name: 'Notify Lambda', text: 'sendNotification' },
+        },
+        // CloudWatch Note
+        {
+          id: 'note-monitoring',
           type: 'note',
           icon: 'note',
-          position: { x: 450, y: 320 },
-          size: { w: 240, h: 100 },
+          position: { x: 100, y: 280 },
+          size: { w: 200, h: 80 },
           connectors: [],
-          data: {
-            name: 'Note',
-            text: 'This diagram demonstrates a simple authentication system with User class implementing IAuthService interface. UserRole enum defines access levels.',
+          data: { name: 'Note', text: 'All Lambda functions send logs to CloudWatch for monitoring and debugging' },
+        },
+        // Architecture Note
+        {
+          id: 'note-architecture',
+          type: 'note',
+          icon: 'note',
+          position: { x: 100, y: 420 },
+          size: { w: 220, h: 90 },
+          connectors: [],
+          data: { name: 'Note', text: 'Serverless architecture enables automatic scaling, pay-per-use pricing, and zero server management' },
+        },
+        // Security Note
+        {
+          id: 'note-security',
+          type: 'note',
+          icon: 'note',
+          position: { x: 600, y: 420 },
+          size: { w: 200, h: 80 },
+          connectors: [],
+          data: { name: 'Note', text: 'Cognito provides secure authentication with OAuth 2.0 and SAML 2.0 support' },
+        },
+        // Database Note
+        {
+          id: 'note-database',
+          type: 'note',
+          icon: 'note',
+          position: { x: 850, y: 420 },
+          size: { w: 180, h: 90 },
+          connectors: [],
+          data: { name: 'Note', text: 'DynamoDB offers single-digit millisecond performance at any scale' },
+        },
+        // Workflow Idea Pin
+        {
+          id: 'idea-workflow',
+          type: 'idea-pin',
+          icon: 'idea-pin',
+          position: { x: 100, y: 560 },
+          size: { w: 220, h: 60 },
+          connectors: [],
+          data: { 
+            name: 'Idea',
+            text: 'Add SQS queue for better decoupling between components' 
           },
         },
-      ],
-      edges: [],
-    },
-    {
-      id: 'diagram-2',
-      name: 'E-Commerce Domain Model',
-      settings: {
-        grid: true,
-        snap: true,
-        theme: 'dark',
-      },
-      nodes: [
+        // Performance Idea Pin
         {
-          id: 'order-class',
-          type: 'class',
-          icon: 'class',
-          position: { x: 300, y: 100 },
-          size: { w: 240, h: 160 },
-          connectors: ['top', 'right', 'bottom', 'left'],
-          data: {
-            name: 'Order',
-            fields: [
-              { visibility: '-', name: 'id', type: 'string' },
-              { visibility: '-', name: 'customer', type: 'Customer' },
-              { visibility: '-', name: 'items', type: 'OrderItem[]' },
-              { visibility: '-', name: 'total', type: 'number' },
-            ],
-            methods: [
-              { visibility: '+', name: 'calculateTotal', params: [], returns: 'number' },
-              { visibility: '+', name: 'addItem', params: [], returns: 'void' },
-            ],
+          id: 'idea-performance',
+          type: 'idea-pin',
+          icon: 'idea-pin',
+          position: { x: 380, y: 560 },
+          size: { w: 200, h: 60 },
+          connectors: [],
+          data: { 
+            name: 'Idea',
+            text: 'Implement caching with ElastiCache to reduce latency' 
           },
         },
+        // Cost Idea Pin
         {
-          id: 'customer-class',
-          type: 'class',
-          icon: 'class',
-          position: { x: 100, y: 300 },
-          size: { w: 240, h: 140 },
-          connectors: ['top', 'right', 'bottom', 'left'],
-          data: {
-            name: 'Customer',
-            fields: [
-              { visibility: '-', name: 'id', type: 'string' },
-              { visibility: '-', name: 'name', type: 'string' },
-              { visibility: '-', name: 'orders', type: 'Order[]' },
-            ],
-            methods: [
-              { visibility: '+', name: 'placeOrder', params: [], returns: 'Order' },
-            ],
-          },
-        },
-        {
-          id: 'item-class',
-          type: 'class',
-          icon: 'class',
-          position: { x: 500, y: 300 },
-          size: { w: 240, h: 140 },
-          connectors: ['top', 'right', 'bottom', 'left'],
-          data: {
-            name: 'OrderItem',
-            fields: [
-              { visibility: '-', name: 'product', type: 'Product' },
-              { visibility: '-', name: 'quantity', type: 'number' },
-              { visibility: '-', name: 'price', type: 'number' },
-            ],
-            methods: [
-              { visibility: '+', name: 'getSubtotal', params: [], returns: 'number' },
-            ],
+          id: 'idea-cost',
+          type: 'idea-pin',
+          icon: 'idea-pin',
+          position: { x: 640, y: 560 },
+          size: { w: 180, h: 60 },
+          connectors: [],
+          data: { 
+            name: 'Idea',
+            text: 'Use Lambda reserved concurrency to control costs' 
           },
         },
       ],
