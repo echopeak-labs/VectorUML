@@ -164,6 +164,9 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
           values: type === 'enum' ? [] : undefined,
           text: type === 'note' ? 'Note text' : undefined,
         },
+        ...(type === 'note' ? {
+          style: { width: 250, height: 150 },
+        } : {}),
       };
 
       setNodes((nds) => [...nds, newNode]);

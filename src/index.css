@@ -93,4 +93,15 @@ All colors MUST be HSL.
     fill: hsl(var(--foreground)) !important;
     font-size: 12px !important;
   }
+
+  /* Node resizer styling */
+  .react-flow__resize-control.handle {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+  }
+
+  .react-flow__resize-control.line {
+    border-width: 2px;
+  }
 }
