@@ -45,31 +45,18 @@ export const UMLClassNode = memo(({ data, type, id }: NodeProps) => {
 
   return (
     <div className={`rounded-lg border-2 bg-card shadow-lg min-w-[240px]`} style={{ borderColor: `hsl(var(--${color}))` }}>
-      {/* Connection Handles - all bidirectional */}
-      <Handle 
-        type="source" 
-        position={Position.Top} 
-        id="top"
-        className="w-3 h-3 !bg-primary hover:!bg-primary/80" 
-      />
-      <Handle 
-        type="source" 
-        position={Position.Left} 
-        id="left"
-        className="w-3 h-3 !bg-primary hover:!bg-primary/80" 
-      />
-      <Handle 
-        type="source" 
-        position={Position.Right} 
-        id="right"
-        className="w-3 h-3 !bg-primary hover:!bg-primary/80" 
-      />
-      <Handle 
-        type="source" 
-        position={Position.Bottom} 
-        id="bottom"
-        className="w-3 h-3 !bg-primary hover:!bg-primary/80" 
-      />
+      {/* Connection Handles - both source and target for bidirectional connections */}
+      <Handle type="source" position={Position.Top} id="top-source" className="w-3 h-3 !bg-primary hover:!bg-primary/80" />
+      <Handle type="target" position={Position.Top} id="top-target" className="w-3 h-3 !bg-primary hover:!bg-primary/80" />
+      
+      <Handle type="source" position={Position.Left} id="left-source" className="w-3 h-3 !bg-primary hover:!bg-primary/80" />
+      <Handle type="target" position={Position.Left} id="left-target" className="w-3 h-3 !bg-primary hover:!bg-primary/80" />
+      
+      <Handle type="source" position={Position.Right} id="right-source" className="w-3 h-3 !bg-primary hover:!bg-primary/80" />
+      <Handle type="target" position={Position.Right} id="right-target" className="w-3 h-3 !bg-primary hover:!bg-primary/80" />
+      
+      <Handle type="source" position={Position.Bottom} id="bottom-source" className="w-3 h-3 !bg-primary hover:!bg-primary/80" />
+      <Handle type="target" position={Position.Bottom} id="bottom-target" className="w-3 h-3 !bg-primary hover:!bg-primary/80" />
 
       {/* Header */}
       <div className={`flex items-center gap-2 px-3 py-2 rounded-t-md`} style={{ backgroundColor: `hsl(var(--${color}))` }}>
