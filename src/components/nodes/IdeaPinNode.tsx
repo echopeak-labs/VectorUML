@@ -23,30 +23,33 @@ export const IdeaPinNode = memo(({ data }: NodeProps) => {
       <Handle type="source" position={Position.Left} className="w-2 h-2 !bg-primary opacity-0" />
       <Handle type="target" position={Position.Left} className="w-2 h-2 !bg-primary opacity-0" />
 
+      {/* Glowing Red Pin Icon - Outside the box */}
+      <div className="absolute -top-3 -left-3 z-20">
+        <div 
+          className="absolute inset-0 rounded-full blur-md animate-pulse"
+          style={{
+            background: 'radial-gradient(circle, rgba(239, 68, 68, 0.6) 0%, transparent 70%)',
+            width: '32px',
+            height: '32px',
+          }}
+        />
+        <Pin 
+          className="h-6 w-6 relative z-10 rotate-45" 
+          style={{ 
+            color: 'rgb(239, 68, 68)',
+            filter: 'drop-shadow(0 0 8px rgb(239, 68, 68)) drop-shadow(0 0 4px rgb(239, 68, 68))'
+          }} 
+          fill="rgb(239, 68, 68)"
+        />
+      </div>
+
+      {/* Text Box */}
       <div 
-        className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary shadow-lg min-w-[180px] max-w-[400px]"
+        className="flex items-center px-4 py-2.5 rounded-lg bg-primary shadow-lg min-w-[180px] max-w-[400px]"
         style={{
           boxShadow: '0 4px 20px hsl(var(--primary) / 0.5), 0 0 40px hsl(var(--primary) / 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
         }}
       >
-        {/* Glowing Red Pin Icon */}
-        <div className="relative flex-shrink-0">
-          <div 
-            className="absolute inset-0 rounded-full blur-md animate-pulse"
-            style={{
-              background: 'radial-gradient(circle, rgba(239, 68, 68, 0.6) 0%, transparent 70%)',
-            }}
-          />
-          <Pin 
-            className="h-5 w-5 relative z-10 rotate-45" 
-            style={{ 
-              color: 'rgb(239, 68, 68)',
-              filter: 'drop-shadow(0 0 8px rgb(239, 68, 68)) drop-shadow(0 0 4px rgb(239, 68, 68))'
-            }} 
-            fill="rgb(239, 68, 68)"
-          />
-        </div>
-
         {/* Editable Text */}
         {isEditing ? (
           <input
