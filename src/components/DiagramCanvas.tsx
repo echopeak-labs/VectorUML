@@ -27,6 +27,10 @@ import { AWSAPIGatewayNode } from './nodes/AWSAPIGatewayNode';
 import { AWSALBNode } from './nodes/AWSALBNode';
 import { AWSAmplifyNode } from './nodes/AWSAmplifyNode';
 import { AWSDynamoDBNode } from './nodes/AWSDynamoDBNode';
+import { AWSECSNode } from './nodes/AWSECSNode';
+import { GithubActionsNode } from './nodes/GithubActionsNode';
+import { CircleCINode } from './nodes/CircleCINode';
+import { AWSCodeBuildNode } from './nodes/AWSCodeBuildNode';
 import { GenericAWSNode } from './nodes/GenericAWSNode';
 import { ContextMenu } from './ContextMenu';
 import { EdgeLabelDialog } from './EdgeLabelDialog';
@@ -50,17 +54,17 @@ const nodeTypes = {
   'aws-lambda': AWSLambdaNode,
   'aws-api-gateway': AWSAPIGatewayNode,
   'aws-dynamodb': AWSDynamoDBNode,
-  'aws-ecs': GenericAWSNode,
+  'aws-ecs': AWSECSNode,
   'aws-ecr': AWSECRNode,
   'aws-amplify': AWSAmplifyNode,
   'aws-cognito': AWSCognitoNode,
   'aws-s3': AWSS3Node,
   'aws-alb': AWSALBNode,
   'aws-ec2': AWSEC2Node,
-  'github-actions': UMLClassNode,
-  'circleci': UMLClassNode,
-  'aws-codebuild': UMLClassNode,
-  'aws-codepipeline': UMLClassNode,
+  'github-actions': GithubActionsNode,
+  'circleci': CircleCINode,
+  'aws-codebuild': AWSCodeBuildNode,
+  'aws-codepipeline': GenericAWSNode,
 };
 
 interface DiagramCanvasProps {
