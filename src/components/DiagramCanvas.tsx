@@ -18,6 +18,16 @@ import { UMLClassNode } from './nodes/UMLClassNode';
 import { UMLInterfaceNode } from './nodes/UMLInterfaceNode';
 import { UMLNoteNode } from './nodes/UMLNoteNode';
 import { UMLEnumNode } from './nodes/UMLEnumNode';
+import { AWSS3Node } from './nodes/AWSS3Node';
+import { AWSECRNode } from './nodes/AWSECRNode';
+import { AWSLambdaNode } from './nodes/AWSLambdaNode';
+import { AWSEC2Node } from './nodes/AWSEC2Node';
+import { AWSCognitoNode } from './nodes/AWSCognitoNode';
+import { AWSAPIGatewayNode } from './nodes/AWSAPIGatewayNode';
+import { AWSALBNode } from './nodes/AWSALBNode';
+import { AWSAmplifyNode } from './nodes/AWSAmplifyNode';
+import { AWSDynamoDBNode } from './nodes/AWSDynamoDBNode';
+import { GenericAWSNode } from './nodes/GenericAWSNode';
 import { ContextMenu } from './ContextMenu';
 import { EdgeLabelDialog } from './EdgeLabelDialog';
 import { Button } from './ui/button';
@@ -35,6 +45,22 @@ const nodeTypes = {
   actor: UMLClassNode,
   usecase: UMLClassNode,
   component: UMLClassNode,
+  'api-server': UMLClassNode,
+  'database': UMLClassNode,
+  'aws-lambda': AWSLambdaNode,
+  'aws-api-gateway': AWSAPIGatewayNode,
+  'aws-dynamodb': AWSDynamoDBNode,
+  'aws-ecs': GenericAWSNode,
+  'aws-ecr': AWSECRNode,
+  'aws-amplify': AWSAmplifyNode,
+  'aws-cognito': AWSCognitoNode,
+  'aws-s3': AWSS3Node,
+  'aws-alb': AWSALBNode,
+  'aws-ec2': AWSEC2Node,
+  'github-actions': UMLClassNode,
+  'circleci': UMLClassNode,
+  'aws-codebuild': UMLClassNode,
+  'aws-codepipeline': UMLClassNode,
 };
 
 interface DiagramCanvasProps {
