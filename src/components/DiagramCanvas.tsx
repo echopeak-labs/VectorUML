@@ -242,19 +242,19 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
                 ...e, 
                 label: newLabel,
                 labelStyle: { 
-                  fill: 'hsl(var(--foreground))', 
-                  fontSize: 13, 
-                  fontWeight: 500,
-                  letterSpacing: '0.02em'
+                  fill: 'hsl(var(--primary-foreground))', 
+                  fontSize: 14, 
+                  fontWeight: 600,
+                  letterSpacing: '0.03em'
                 },
                 labelBgStyle: { 
-                  fill: 'hsl(var(--card))', 
+                  fill: 'hsl(var(--primary))', 
                   fillOpacity: 0.95,
-                  rx: 4,
-                  filter: 'drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3))'
+                  rx: 6,
+                  filter: 'drop-shadow(0 4px 12px hsl(var(--primary) / 0.4))'
                 },
-                labelBgPadding: [8, 6] as [number, number],
-                labelBgBorderRadius: 4,
+                labelBgPadding: [10, 8] as [number, number],
+                labelBgBorderRadius: 6,
               }
             : e
         )
