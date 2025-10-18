@@ -6,6 +6,7 @@ export type NodeType =
   | 'package' 
   | 'note' 
   | 'markdown'
+  | 'idea-pin'
   | 'actor' 
   | 'usecase' 
   | 'component'

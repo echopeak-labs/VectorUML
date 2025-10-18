@@ -18,6 +18,7 @@ import { UMLClassNode } from './nodes/UMLClassNode';
 import { UMLInterfaceNode } from './nodes/UMLInterfaceNode';
 import { UMLNoteNode } from './nodes/UMLNoteNode';
 import { MarkdownNode } from './nodes/MarkdownNode';
+import { IdeaPinNode } from './nodes/IdeaPinNode';
 import { UMLEnumNode } from './nodes/UMLEnumNode';
 import { AWSS3Node } from './nodes/AWSS3Node';
 import { AWSECRNode } from './nodes/AWSECRNode';
@@ -47,6 +48,7 @@ const nodeTypes = {
   enum: UMLEnumNode,
   note: UMLNoteNode,
   markdown: MarkdownNode,
+  'idea-pin': IdeaPinNode,
   package: UMLClassNode,
   actor: UMLClassNode,
   usecase: UMLClassNode,
@@ -290,7 +292,7 @@ export function DiagramCanvas({ diagram, projectId, onDiagramUpdate }: DiagramCa
           fields: type === 'class' || type === 'abstract' ? [] : undefined,
           methods: type === 'class' || type === 'interface' || type === 'abstract' ? [] : undefined,
           values: type === 'enum' ? [] : undefined,
-          text: type === 'note' || type === 'markdown' ? 'Note text' : undefined,
+          text: type === 'note' || type === 'markdown' || type === 'idea-pin' ? '' : undefined,
         },
         ...(type === 'note' || type === 'markdown' ? {
           width: 250,
