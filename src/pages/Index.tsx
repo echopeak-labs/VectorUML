@@ -107,7 +107,7 @@ const Index = () => {
               <Link to="/board">
                 <Button variant="ghost">Dashboard</Button>
               </Link>
-              <Link to="/board">
+              <Link to="/get-started">
                 <Button>Get Started</Button>
               </Link>
             </nav>
